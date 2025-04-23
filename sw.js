@@ -1,6 +1,9 @@
 "use strict";
 const cacheName = "piac-pwa-v1";
-const filesToCache = ["/", "/index.html", "/style.css", "/js/main.js"];
+const filesToCache = ["./", "./index.html", "./style.css", "./js/main.js"];
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+}
 self.addEventListener("install", (event) => {
     event.waitUntil(caches.open(cacheName).then((cache) => {
         return cache.addAll(filesToCache);

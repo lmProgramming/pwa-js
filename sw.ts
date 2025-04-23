@@ -1,5 +1,9 @@
 const cacheName = "piac-pwa-v1";
-const filesToCache = ["/", "/index.html", "/style.css", "/js/main.js"];
+const filesToCache = ["./", "./index.html", "./style.css", "./js/main.js"];
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
 
 self.addEventListener("install", (event: ExtendableEvent) => {
   event.waitUntil(
@@ -75,7 +79,6 @@ self.addEventListener("fetch", (event: FetchEvent) => {
         );
       })
       .catch(() => {
-        // Fallback dla braku połączenia
         if (event.request.mode === "navigate") {
           return caches.match("/index.html") as Promise<Response>;
         }
