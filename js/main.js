@@ -1,5 +1,5 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js'
-import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-messaging.js'
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-messaging.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAWlxciG0vZSLD78nC2n2qGNOvuzul3rTE",
@@ -9,10 +9,10 @@ const firebaseConfig = {
     messagingSenderId: "438732315703",
     appId: "1:438732315703:web:bcc4ff82c8ce5e4b1f73b2",
     measurementId: "G-7M93B09YP4"
-}
+};
 
-const app = initializeApp(firebaseConfig)
-const messaging = getMessaging(app)
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
@@ -22,96 +22,89 @@ if ("serviceWorker" in navigator) {
                 console.log(
                     "Main PWA Service Worker registered with scope:",
                     registration.scope
-                )
+                );
             })
             .catch(error => {
-                console.error("Main PWA Service Worker registration failed:", error)
-            })
-    })
-}
-
-function requestNotificationPermission() {
-    console.log("Requesting notification permission...")
-    Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-            console.log("Notification permission granted.")
-            retrieveToken()
-        } else {
-            console.log("Unable to get permission to notify.")
-        }
-    })
+                console.error("Main PWA Service Worker registration failed:", error);
+            });
+    });
 }
 
 const enableNotificationsButton = document.getElementById(
     "enable-notifications-button"
-)
-enableNotificationsButton?.addEventListener(
-    "click",
-    requestNotificationPermission
-)
+);
+enableNotificationsButton?.addEventListener("click", requestPermissionAndRetrieveToken);
+
+async function requestPermissionAndRetrieveToken() {
+    if (!("serviceWorker" in navigator)) {
+        console.error("Service Workers not supported.");
+        return;
+    }
+    if (!("Notification" in window)) {
+        console.error("Notifications not supported.");
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        console.log("Service Worker is ready and active.", registration);
+
+        console.log("Requesting notification permission...");
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+            console.log("Notification permission granted.");
+            retrieveToken();
+        } else {
+            console.log("Unable to get permission to notify.");
+        }
+    } catch (error) {
+        console.error("Error during permission request or SW readiness:", error);
+    }
+}
+
 
 const VAPID_KEY =
-    "BDSUjXiUoetn8Qz6mmTlIEFL9Mv6Z-CCmuFofvAk1Uit5mn2TV4EMNHze1ei90PA6maIhR-e563M8XD5ffyiItY"
+    "BDSUjXiUoetn8Qz6mmTlIEFL9Mv6Z-CCmuFofvAk1Uit5mn2TV4EMNHze1ei90PA6maIhR-e563M8XD5ffyiItY";
 
 function retrieveToken() {
     getToken(messaging, { vapidKey: VAPID_KEY })
         .then(currentToken => {
             if (currentToken) {
-                console.log("FCM Token:", currentToken)
-                sendTokenToServer(currentToken)
+                console.log("FCM Token:", currentToken);
+                sendTokenToServer(currentToken);
+                if (enableNotificationsButton) enableNotificationsButton.textContent = "Notifications Enabled";
+                if (enableNotificationsButton) enableNotificationsButton.disabled = true;
             } else {
                 console.log(
-                    "No registration token available. Request permission to generate one."
-                )
-                // Might need to call requestNotificationPermission() again or guide the user
+                    "No registration token available. Permission might not be granted."
+                );
+                if (enableNotificationsButton) enableNotificationsButton.textContent = "Enable Notifications";
+                if (enableNotificationsButton) enableNotificationsButton.disabled = false;
             }
         })
         .catch(err => {
-            console.error("An error occurred while retrieving token. ", err)
-            // Handle specific errors if needed (e.g., messaging/permission-blocked)
-        })
+            console.error("An error occurred while retrieving token. ", err);
+            if (enableNotificationsButton) enableNotificationsButton.textContent = "Error Getting Token";
+            if (enableNotificationsButton) enableNotificationsButton.disabled = true;
+        });
 }
 
 function sendTokenToServer(token) {
-    console.log("Sending token to server (implementation needed):", token)
-    // Replace with your actual fetch or axios call to your backend API
-    /*
-    fetch('/api/save-fcm-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify({ token }), // Send token, associate with user server-side
-    })
-    .then(response => response.json())
-    .then(data => console.log('Token save response:', data))
-    .catch(error => console.error('Error saving token:', error));
-    */
+    console.log("Sending token to server (implementation needed):", token);
 }
 
 onMessage(messaging, payload => {
-    console.log("Message received while app is in foreground: ", payload)
-
-    const notificationTitle = payload.notification?.title ?? "Foreground Message"
+    console.log("Message received while app is in foreground: ", payload);
+    const notificationTitle = payload.notification?.title ?? "Foreground Message";
     const notificationOptions = {
         body: payload.notification?.body ?? "You have a message.",
         icon: payload.notification?.icon ?? "/images/icons/icon-192x192.png",
         data: payload.data
-    }
-
-    // Option 1: Show using Notification API (acts like a system notification)
-    // new Notification(notificationTitle, notificationOptions);
-
-    // Option 2: Update UI directly (e.g., show an in-app banner/toast)
-    displayInAppNotification(notificationTitle, notificationOptions)
-})
+    };
+    displayInAppNotification(notificationTitle, notificationOptions);
+});
 
 function displayInAppNotification(title, options) {
-    console.log(`Displaying in-app: ${title} - ${options.body}`)
-    // Implement your UI logic here, e.g.:
-    // const notificationElement = document.getElementById('in-app-notification');
-    // if (notificationElement) {
-    //    notificationElement.querySelector('.title').textContent = title;
-    //    notificationElement.querySelector('.body').textContent = options.body;
-    //    notificationElement.style.display = 'block';
-    //    setTimeout(() => { notificationElement.style.display = 'none'; }, 5000);
-    // }
+    console.log(`Displaying in-app: ${title} - ${options.body}`);
 }
