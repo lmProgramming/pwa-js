@@ -7,7 +7,7 @@ const filesToCache = [
     basePath + 'style.css',
     basePath + 'js/main.js',
     basePath + 'manifest.json',
-    basePath + 'images/icons/pwa-icon-192x192.png'
+    basePath + 'public/images/icons/pwa-icon-192x192.png'
 ];
 
 
