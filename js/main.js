@@ -17,7 +17,7 @@ const messaging = getMessaging(app)
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("/sw.js")
+            .register("./sw.js")
             .then(registration => {
                 console.log(
                     "Main PWA Service Worker registered with scope:",
