@@ -2,7 +2,7 @@
   "name": "PIAC TEST",
   "short_name": "PIAC",
   "lang": "en-US",
-  "start_url": ".",
+  "start_url": "/pwa-js/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#db4938",
