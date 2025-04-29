@@ -1,12 +1,15 @@
+const basePath = '/pwa-js/';
+
 const cacheName = "piac-pwa-v1";
 const filesToCache = [
-    "./",
-    "./index.html",
-    "./style.css",
-    "./js/main.js",
-    "./manifest.json",
-    "./images/icons/pwa-icon-192x192.png"
+    basePath,
+    basePath + 'index.html',
+    basePath + 'style.css',
+    basePath + 'js/main.js',
+    basePath + 'manifest.json',
+    basePath + 'images/icons/pwa-icon-192x192.png'
 ];
+
 
 self.addEventListener("install", event => {
     console.log('[SW] Install event');
@@ -40,30 +43,22 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
-        return;
-    }
-
     event.respondWith(
         caches.open(cacheName).then(cache => {
             return cache.match(event.request).then(response => {
                 if (response) {
-                    const fetchPromise = fetch(event.request).then(networkResponse => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    }).catch(err => {
-                        console.warn('[SW] Network fetch failed during stale-while-revalidate:', err);
-                    });
                     return response;
                 }
 
                 return fetch(event.request).then(networkResponse => {
-                    cache.put(event.request, networkResponse.clone());
+                    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                        cache.put(event.request, networkResponse.clone());
+                    }
                     return networkResponse;
                 }).catch(error => {
                     console.error('[SW] Network fetch failed:', error);
                     if (event.request.mode === 'navigate') {
-                        return caches.match('/index.html');
+                        return caches.match(basePath + 'index.html');
                     }
                 });
             });
