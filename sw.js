@@ -4,10 +4,11 @@ const cacheName = "piac-pwa-v1";
 const filesToCache = [
     basePath,
     basePath + 'index.html',
+    basePath + 'cats.html',
     basePath + 'style.css',
     basePath + 'js/main.js',
     basePath + 'manifest.json',
-    basePath + 'public/images/icons/pwa-icon-192x192.png'
+    basePath + 'images/icons/pwa-icon-192x192.png'
 ];
 
 
