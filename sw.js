@@ -8,7 +8,16 @@ const filesToCache = [
     basePath + 'style.css',
     basePath + 'js/main.js',
     basePath + 'manifest.json',
-    basePath + 'images/icons/pwa-icon-192x192.png'
+    basePath + 'images/icons/pwa-icon-192x192.png',
+    basePath + 'images/dog1.webp',
+    basePath + 'images/dog2.webp',
+    basePath + 'images/dog3.webp',
+    basePath + 'images/dog4.webp',
+    basePath + 'images/dog5.webp',
+    basePath + 'images/cat1.webp',
+    basePath + 'images/cat2.webp',
+    basePath + 'images/cat3.webp',
+    basePath + 'images/cat4.webp',
 ];
 
 
